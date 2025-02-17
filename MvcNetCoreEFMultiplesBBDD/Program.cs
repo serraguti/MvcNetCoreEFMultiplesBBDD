@@ -4,12 +4,19 @@ using MvcNetCoreEFMultiplesBBDD.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.dd
+// Add services to the container.
+builder.Services.AddTransient<RepositoryEmpleados>();
 string connectionString =
     builder.Configuration.GetConnectionString("SqlHospital");
-builder.Services.AddTransient<RepositoryEmpleados>();
 builder.Services.AddDbContext<HospitalContext>
     (options => options.UseSqlServer(connectionString));
+//string connectionString =
+//    builder.Configuration.GetConnectionString("OracleHospital");
+//builder.Services.AddDbContext<HospitalContext>
+//    (options => options.UseOracle(connectionString
+//    , options => options.UseOracleSQLCompatibility
+//    (OracleSQLCompatibility.DatabaseVersion19)));
+
 
 builder.Services.AddControllersWithViews();
 
