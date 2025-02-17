@@ -1,19 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MvcNetCoreEFMultiplesBBDD.Data;
 using MvcNetCoreEFMultiplesBBDD.Models;
+using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 #region VISTAS Y PROCEDIMIENTOS
 /*
- create view V_EMPLEADOS
-as
-	select EMP_NO as IDEMPLEADO
-	, EMP.APELLIDO, EMP.OFICIO, EMP.SALARIO
-	, DEPT.DNOMBRE AS DEPARTAMENTO
-	, DEPT.LOC AS LOCALIDAD
-	from EMP
-	inner join DEPT
-	on EMP.DEPT_NO = DEPT.DEPT_NO
-go
 create procedure SP_ALL_VEMPLEADOS
 as
 	select * from V_EMPLEADOS
@@ -32,25 +24,29 @@ as
 
 namespace MvcNetCoreEFMultiplesBBDD.Repositories
 {
-    public class RepositoryEmpleados: IRepositoryEmpleados
+    public class RepositoryEmpleadosOracle : IRepositoryEmpleados
     {
         private HospitalContext context;
 
-        public RepositoryEmpleados(HospitalContext context)
+        public RepositoryEmpleadosOracle(HospitalContext context)
         {
             this.context = context;
         }
 
         public async Task<List<EmpleadoView>> GetEmpleadosAsync()
         {
-            string sql = "SP_ALL_VEMPLEADOS";
-            var consulta =
-                this.context.EmpleadosView
-                .FromSqlRaw(sql);
+            string sql = "begin ";
+            sql += " SP_ALL_VEMPLEADOS (:p_cursor_empleados);";
+            sql += " end;";
+            OracleParameter pamCursor = new OracleParameter();
+            pamCursor.ParameterName = "p_cursor_empleados";
+            pamCursor.Value = null;
+            pamCursor.Direction = ParameterDirection.Output;
+            //DEBEMOS INDICAR EL TIPO DE DATO DE ORACLE CURSOR
+            pamCursor.OracleDbType = OracleDbType.RefCursor;
+            var consulta = this.context.EmpleadosView
+                .FromSqlRaw(sql, pamCursor);
             return await consulta.ToListAsync();
-            //var consulta = from datos in this.context.EmpleadosView
-            //               select datos;
-            //return await consulta.ToListAsync();
         }
 
         public async Task<EmpleadoView> FindEmpleadoAsync(int idEmpleado)
@@ -58,7 +54,8 @@ namespace MvcNetCoreEFMultiplesBBDD.Repositories
             var consulta = from datos in this.context.EmpleadosView
                            where datos.IdEmpleado == idEmpleado
                            select datos;
-            return await consulta.FirstOrDefaultAsync();
+            var data = await consulta.ToListAsync();
+            return data.First();
         }
     }
 }

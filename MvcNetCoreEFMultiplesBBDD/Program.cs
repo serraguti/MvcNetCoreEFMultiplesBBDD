@@ -1,21 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using MvcNetCoreEFMultiplesBBDD.Data;
 using MvcNetCoreEFMultiplesBBDD.Repositories;
+using Oracle.ManagedDataAccess.Client;
 
 var builder = WebApplication.CreateBuilder(args);
-
+OracleConfiguration.SqlNetAllowedLogonVersionClient = OracleAllowedLogonVersionClient.Version11;
 // Add services to the container.
-builder.Services.AddTransient<RepositoryEmpleados>();
-string connectionString =
-    builder.Configuration.GetConnectionString("SqlHospital");
-builder.Services.AddDbContext<HospitalContext>
-    (options => options.UseSqlServer(connectionString));
+//builder.Services.AddTransient<IRepositoryEmpleados, RepositoryEmpleados>();
 //string connectionString =
-//    builder.Configuration.GetConnectionString("OracleHospital");
+//    builder.Configuration.GetConnectionString("SqlHospital");
 //builder.Services.AddDbContext<HospitalContext>
-//    (options => options.UseOracle(connectionString
-//    , options => options.UseOracleSQLCompatibility
-//    (OracleSQLCompatibility.DatabaseVersion19)));
+//    (options => options.UseSqlServer(connectionString));
+builder.Services.AddTransient<IRepositoryEmpleados, RepositoryEmpleadosOracle>();
+string connectionString =
+    builder.Configuration.GetConnectionString("OracleHospital");
+builder.Services.AddDbContext<HospitalContext>
+    (options => options.UseOracle(connectionString
+    , options => options.UseOracleSQLCompatibility
+    (OracleSQLCompatibility.DatabaseVersion19)));
 
 
 builder.Services.AddControllersWithViews();
