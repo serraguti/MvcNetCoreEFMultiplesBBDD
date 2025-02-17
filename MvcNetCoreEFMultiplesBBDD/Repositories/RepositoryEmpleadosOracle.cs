@@ -6,10 +6,6 @@ using System.Data;
 
 #region VISTAS Y PROCEDIMIENTOS
 /*
-create procedure SP_ALL_VEMPLEADOS
-as
-	select * from V_EMPLEADOS
-go
 create or replace view V_EMPLEADOS
 as
        select EMP.EMP_NO as IDEMPLEADO
@@ -19,6 +15,13 @@ as
        from EMP
        inner join DEPT
        on EMP.DEPT_NO=DEPT.DEPT_NO;
+create or replace procedure SP_ALL_VEMPLEADOS
+(p_cursor_empleados out sys_refcursor)
+as
+begin
+  open p_cursor_empleados for
+  select * from V_EMPLEADOS;
+end;
  */
 #endregion
 
