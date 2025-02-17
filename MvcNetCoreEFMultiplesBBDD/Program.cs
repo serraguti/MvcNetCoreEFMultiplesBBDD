@@ -11,13 +11,20 @@ OracleConfiguration.SqlNetAllowedLogonVersionClient = OracleAllowedLogonVersionC
 //    builder.Configuration.GetConnectionString("SqlHospital");
 //builder.Services.AddDbContext<HospitalContext>
 //    (options => options.UseSqlServer(connectionString));
-builder.Services.AddTransient<IRepositoryEmpleados, RepositoryEmpleadosOracle>();
+//builder.Services.AddTransient<IRepositoryEmpleados, RepositoryEmpleadosOracle>();
+//string connectionString =
+//    builder.Configuration.GetConnectionString("OracleHospital");
+//builder.Services.AddDbContext<HospitalContext>
+//    (options => options.UseOracle(connectionString
+//    , options => options.UseOracleSQLCompatibility
+//    (OracleSQLCompatibility.DatabaseVersion21)));
+//-----------------MYSQL----------------
+builder.Services.AddTransient
+    <IRepositoryEmpleados, RepositoryEmpleadosMySql>();
 string connectionString =
-    builder.Configuration.GetConnectionString("OracleHospital");
+    builder.Configuration.GetConnectionString("MySqlHospital");
 builder.Services.AddDbContext<HospitalContext>
-    (options => options.UseOracle(connectionString
-    , options => options.UseOracleSQLCompatibility
-    (OracleSQLCompatibility.DatabaseVersion19)));
+    (options => options.UseMySQL(connectionString));
 
 
 builder.Services.AddControllersWithViews();
